@@ -3,6 +3,7 @@ import checkvalidator from "../utils/validator.js";
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 
 interface Registerbody {
@@ -113,17 +114,28 @@ export const login = async (req: Request<{}, {}, LoginBody>, res: Response<Respo
 }
 
 
-// export const logout = async (req: Request, res: Response<Responsebody>): Promise<void> => {
+export const logout = async (req: Request, res: Response<Responsebody>): Promise<void> => {
 
 
-//     try {
-//         const { token } = req.cookies;
+    try {
+        const { token } = req.cookies;
+
+
+        
 
 
 
 
 
-//     } 
+    } 
+    // catch(error){
+    //     if(error instanceof Error){
+    //         res.status().send({
+    //             message:
+    //         })
+    //     }
+
+    // }
 
 
 

@@ -11,6 +11,7 @@ interface Registerbody {
     firstName: string;
     emailId: string;
     password: string;
+    role?: "user";
 }
 
 interface Responsebody {
@@ -23,16 +24,17 @@ export const Register = async (req: Request<{}, {}, Registerbody>, res: Response
     try {
 
         checkvalidator(req.body);
-        const { firstName, emailId, password } = req.body;
+        const { firstName, emailId, password, role } = req.body;
         req.body.password = await bcrypt.hash(password, 10);
 
-        // yha par meine mention nahi kiya req.body se jo data aaya h woh admin h ya user kyunki agar yeh data user ne admin krke bhej diya toh usko extra power shayad mil jaaye. aagae dekhte h par iss point par dhyan dena padega
+        // yha par meine mention nahi kiya req.body se jo data aaya h woh admin h ya user kyunki agar yeh data user ne admin krke bhej diya toh usko extra power shayad mil jaaye. aagae dekhte h par iss point par dhyan dena padega , meine default krdiya agar koi
+        // /user/Register se req krega toh woh automatically 
+        // role : "user" bn jaayega.
+        req.body.role = "user";
         const user = await User.create(req.body);
 
-
-
         const token = jwt.sign(
-            { userid: user._id, emailId: emailId }, process.env.JWT_SKEY as string, { expiresIn: 3600 }
+            { userid: user._id, emailId: emailId, role: "user" }, process.env.JWT_SKEY as string, { expiresIn: 3600 }
         );
 
         res.cookie("token", token, {
@@ -68,6 +70,7 @@ export const Register = async (req: Request<{}, {}, Registerbody>, res: Response
 interface LoginBody {
     emailId: string;
     password: string;
+    role?: "user" | "admin";
 }
 
 export const login = async (req: Request<{}, {}, LoginBody>, res: Response<Responsebody>): Promise<void> => {
@@ -87,8 +90,9 @@ export const login = async (req: Request<{}, {}, LoginBody>, res: Response<Respo
             throw new Error("Invalid Credential");
         }
 
+
         const token = jwt.sign(
-            { userid: user._id, emailId: emailId }, process.env.JWT_SKEY as string, { expiresIn: 3600 }
+            { userid: user._id, emailId: emailId, role: user.role }, process.env.JWT_SKEY as string, { expiresIn: 3600 }
         );
 
         res.cookie("token", token, {
@@ -126,24 +130,24 @@ export const logout = async (req: Request, res: Response<Responsebody>): Promise
 
         const { token } = req.cookies;
         const decoded = jwt.decode(token) as JwtDecoded;
-        const currentTime : number = Math.floor(Date.now()/1000);
-        const expiresIn : number =  decoded.exp - currentTime ;
+        const currentTime: number = Math.floor(Date.now() / 1000);
+        const expiresIn: number = decoded.exp - currentTime;
 
         await redisclient.set(`token:${token}`, "blocked", { EX: expiresIn });
 
-        res.clearCookie("token",{
-            httpOnly:true
+        res.clearCookie("token", {
+            httpOnly: true
         });
-        
+
         res.status(200).send({ message: "Logged out successfully" });
-        
 
-    } 
-    catch(error){
 
-        if(error instanceof Error){
+    }
+    catch (error) {
+
+        if (error instanceof Error) {
             res.status(500).send({
-                message:error.message
+                message: error.message
             })
         }
 
@@ -155,3 +159,46 @@ export const logout = async (req: Request, res: Response<Responsebody>): Promise
 
 
 
+interface AdminRegisterbody {
+    firstName: string;
+    emailId: string;
+    password: string;
+    role?: "admin";
+}
+
+
+export const AdminRegister = async (req: Request<{}, {}, AdminRegisterbody>, res: Response<Responsebody>): Promise<void> => {
+
+    try {
+
+        checkvalidator(req.body);
+        const { firstName, emailId, password, role } = req.body;
+        req.body.password = await bcrypt.hash(password, 10);
+
+        req.body.role = "admin";
+        const user = await User.create(req.body);
+
+        const token = jwt.sign(
+            { userid: user._id, emailId: emailId, role: "admin" }, process.env.JWT_SKEY as string, { expiresIn: 3600 }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            maxAge: 60 * 60 * 1000,
+        })
+
+        res.status(201).send({
+            message: "Registered Successfully"
+        })
+
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(400).send({
+                message: error.message,
+            });
+        }
+
+    }
+
+}

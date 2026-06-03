@@ -67,6 +67,59 @@ export const submitBatch = async (submissions: Judge0Submission[]) => {
 
 }
 
+export const delay = async (ms: number) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve("done");
+        }, ms);
+    });
 
+}
+
+
+
+
+export const submitToken = async (resulttoken: string[]) => {
+
+
+    const options = {
+        method: 'GET',
+        url: 'https://judge0-ce.p.rapidapi.com/submissions/batch',
+        params: {
+            tokens: resulttoken.join(","),
+            base64_encoded: 'true',
+            fields: '*'
+        },
+        headers: {
+            'x-rapidapi-key': process.env.Judge0_API_KEY as string,
+            'x-rapidapi-host': process.env.Judge0_Host as string,
+            'Content-Type': 'application/json'
+        }
+    };
+
+    async function fetchData() {
+        try {
+            const response = await axios.request(options);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    while (true) {
+
+        const result = await fetchData();
+
+        const isResultObtained = result.submissions.every((element: { status_id: number }) => element.status_id > 2);
+
+        if (isResultObtained) {
+            return result.submissions;
+        }
+
+        await delay(1000);
+
+    }
+
+}
 
 

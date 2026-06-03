@@ -16,12 +16,19 @@ interface IProblem {
         input: string,
         output: string,
     }[];
-    StartCode:{
-        javascript:string,
-        python:string,
-        java:string,
+    StartCode: {
+        javascript: string,
+        python: string,
+        java: string,
+        cpp:string,
     };
-    createdby:mongoose.Schema.Types.ObjectId;
+    createdby: mongoose.Schema.Types.ObjectId;
+    referencesolution: {
+        javascript: string,
+        python: string,
+        java: string,
+        cpp:string,
+    };
 
 }
 
@@ -43,7 +50,7 @@ const problemSchema = new Schema<IProblem>({
         type: [String],
         required: true,
         enum: ["array", "Linkedlist", "graph", "dp"],
-        
+
     },
     VisibleTestCases: [{
         input: {
@@ -79,6 +86,28 @@ const problemSchema = new Schema<IProblem>({
             required: true,
         },
         java: {
+            type: String,
+            required: true,
+        },
+        cpp: {
+            type: String,
+            required: true,
+        }
+    },
+    referencesolution: {
+        javascript: {
+            type: String,
+            required: true,
+        },
+        python: {
+            type: String,
+            required: true,
+        },
+        java: {
+            type: String,
+            required: true,
+        },
+        cpp: {
             type: String,
             required: true,
         }

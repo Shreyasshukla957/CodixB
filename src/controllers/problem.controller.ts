@@ -1,11 +1,12 @@
 import type { Request, Response } from "express";
 import problem from "../models/problem.js";
 import { languageId, submitBatch, submitToken } from "../utils/judge0.js";
+import type { CustomRequest } from "../middlewares/admin.middleware.js";
 
 
 type ProblemTag = "array" | "Linkedlist" | "graph" | "dp";
 
-interface RequestBody {
+export interface RequestBody {
     title: string;
     description: string;
     difficulty: "easy" | "medium" | "hard";
@@ -40,10 +41,7 @@ interface Responsebody {
 
 
 
-
-
-
-export const CreateProblem = async (req: Request<{}, {}, RequestBody>, res: Response<Responsebody>): Promise<void> => {
+export const CreateProblem = async (req: CustomRequest, res: Response<Responsebody>): Promise<void> => {
 
     try {
 
@@ -56,7 +54,7 @@ export const CreateProblem = async (req: Request<{}, {}, RequestBody>, res: Resp
             HiddenTestCases,
             StartCode,
             referencesolution
-        } = req.body
+        } = req.body as RequestBody
 
         type languageis = "javascript" | "python" | "java" | "cpp";
 
@@ -87,27 +85,52 @@ export const CreateProblem = async (req: Request<{}, {}, RequestBody>, res: Resp
                 return element.token;
             })
 
+            console.log(resulttoken);
+
             const testResult = await submitToken(resulttoken);
 
-            for (const element of testResult){
-                 if(element.status_id!==3){
-                     res.status(400).send({
-                        message:"Error Occured",
+            // here we can create a object for status id and it's error , something like this .
+            // {
+                // 1:"in  queue",
+                // 2:"processing",
+                // 3:"Accepted",
+                // 4:"wrong ans",
+                // 5,6,7,8,---14.
+            // }
+
+            console.log(testResult);
+            for (const element of testResult) {
+                if (element.status_id !== 3) {
+                    res.status(400).send({
+                        message: "Error Occured",
                     })
-                return;
+                    return;
                 }
-            }
-
-        } 
-
-    }
-    catch(error) {
-            if (error instanceof Error) {
-                res.send({
-                    message:error.message
-                })
             }
 
         }
 
+
+        // Let's store it in our DB once the ans in correct 
+
+      const userProblem = await problem.create({
+           ...req.body as RequestBody,
+           createdby: req.result!._id,
+        })
+
+        res.status(200).send({
+            message:"Problem Saved",
+        })
+
     }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(400).send({
+                message: error.message
+            })
+        }
+
+    }
+
+}
+

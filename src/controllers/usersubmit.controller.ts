@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { submitBatch, submitToken } from "../utils/judge0.js";
 import { languageId } from "../utils/judge0.js";
 import { submission } from "../models/submission.js";
+import User from "../models/user.js";
 
 
 
@@ -118,6 +119,17 @@ export const usersubmission = async (req: Request, res: Response) => {
             str_problem.runtime = runtime;
 
             await str_problem.save();
+
+
+            // ab humein yha par important thing yaaad krna h , humne problemsoled krke ek field bnaya tha userSchema mein taaki jo bhi problemsolve kre uska naam/id humein store krana h taaki pata rhe kitna problem ek user ne solve kiya h .
+            // toh uske liye hum yeh krna h ki jaise hi submission ho jaaye humein woh problem store kradena h userSchema mein jo submit krdiya h par uske liye problemid chahiye yaa problemname toh hi problemsaved[problemid] aise store kra skte h . isk solution h jab hum submission krte h toh submissionschema mein problemid aur userid dono h toh waha se utha skte h problemid.
+
+            // phele check krenge ki problemid unique ho matlab woh problemid pehle se hi exist naa krti ho problemsaved mein warna duplicacy ho jaayegi jo hum nahi chahte h .
+
+            if(!req.result.problemSolved.includes(problemId)){
+                req.result.problemSolved.push(problemId);
+                await req.result.save()
+            }
      
 
         res.status(200).send({

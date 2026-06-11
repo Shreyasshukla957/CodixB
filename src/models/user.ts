@@ -1,14 +1,15 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
+import { submission } from "./submission.js";
 
 interface IUser {
     firstName: string;
     lastName?: string;
     emailId: string;
-    age: number;
+    age?: number;
     role: "user" | "admin";
-    problemSolved: string[];
-    password:string;
+    problemSolved?: string[];
+    password: string;
 
 }
 
@@ -43,15 +44,29 @@ const UserSchema = new Schema<IUser>({
         default: "user",
     },
     problemSolved: {
-        type: [String],
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: "problem",
+        }],
+        unique: true,
     },
-    password:{
-        type:String,
-        required:true,
+    password: {
+        type: String,
+        required: true,
     }
 
 
 }, { timestamps: true });
+
+
+// okay so it works as if i delete the profile of user thorugh await User.findbyIdandDelete(id) it will automatically trigger this code and delete the total submitted code by this particular user.
+
+UserSchema.post("findOneAndDelete", async function (doc) {
+    if (doc) {
+        await mongoose.model("submission").deleteMany({ userId: doc._id });
+    }
+})
+
 
 // Model "User" UserSchema follow karke banega.
 // Aur TypeScript us model ke documents ko IUser ke according samjhega.

@@ -16,6 +16,9 @@ interface jwtPayload {
     role: "admin"
 }
 
+// Customrequest = Request k types + result ka type
+
+
 export const adminMiddleware = async (req: Request, res: Response<AuthResponse>, next: NextFunction): Promise<void> => {
 
     try {
@@ -36,8 +39,9 @@ export const adminMiddleware = async (req: Request, res: Response<AuthResponse>,
 
         if (blocked) {
             res.status(401).send({
-                message: "Unauthorized"
-            })
+                message: "Unauthorized Blocked"
+            });
+            return;
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SKEY as string) as jwtPayload
@@ -48,13 +52,15 @@ export const adminMiddleware = async (req: Request, res: Response<AuthResponse>,
         }
 
         if (decoded.role !== "admin") {
-            throw new Error("Not Authorized");
+            throw new Error("Not Authorized");  
         }
 
         const result = await User.findById(decoded.userid);
 
         if (!result)
             throw new Error("User Doesn't Exist");
+
+        req.result = result;
 
         next();
     }

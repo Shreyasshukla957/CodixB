@@ -1,6 +1,8 @@
 import type { Request, Response, NextFunction } from "express"
 import jwt from "jsonwebtoken"
 import redisclient from "../config/redis.js";
+import User from "../models/user.js";
+
 
 interface AuthCookies {
     token?: string;
@@ -13,6 +15,8 @@ interface AuthResponse {
 interface jwtPayload {
     userid: string;
 }
+
+
 
 export const authMiddleware = async (req: Request, res: Response<AuthResponse>, next: NextFunction): Promise<void> => {
 
@@ -34,10 +38,11 @@ export const authMiddleware = async (req: Request, res: Response<AuthResponse>, 
         const blocked = await redisclient.get(`token:${token}`)
 
         // if we get const blocked = "blocked" from redisclient.get we will send res as unauthorized token because it is blocked .
-        if(blocked){
+        if (blocked) {
             res.status(401).send({
-                message:"Unauthorized"
-            })
+                message: "Unauthorized"
+            });
+            return;
         }
 
 
@@ -49,6 +54,15 @@ export const authMiddleware = async (req: Request, res: Response<AuthResponse>, 
         if (!decoded) {
             throw new Error("Not Authorized");
         }
+
+        const result = await User.findById(decoded.userid);
+
+        if (!result)
+            throw new Error("User Doesn't Exist");
+
+        req.result = result;
+
+
         next();
     }
 

@@ -34,7 +34,8 @@ const checkvalidator = (data: Partial<Registerbody>):void => {
         throw new Error("Firstname is not valid");
     }
 
-    if(typeof data.password !== "string" || validator.isStrongPassword(data.password,{
+    // by mistake i flipped the logic of validator.isStrongPassword throwing error if the password is strong but as we know that if the password is strong it returns true . so i should use !validator.isStrongPassword()
+    if(typeof data.password !== "string" || !validator.isStrongPassword(data.password,{
         minLength:8,
         minLowercase:1,
         minUppercase:1,

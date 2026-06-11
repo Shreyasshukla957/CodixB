@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import redisclient from "../config/redis.js";
+import { submission } from "../models/submission.js";
 
 
 interface Registerbody {
@@ -200,5 +201,34 @@ export const AdminRegister = async (req: Request<{}, {}, AdminRegisterbody>, res
         }
 
     }
+
+}
+
+
+export const deleteProfile = async (req: Request, res: Response) => {
+
+
+    try {
+        const id = req.result._id;
+
+        // this will delete the profile of the user and also trigger the the userSchema.post and delete all of the submissions by this particular user.
+        const userId = await User.findByIdAndDelete(id);
+
+
+        res.status(200).send({
+            message: "Deleted Successfully",
+        })
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(500).send(
+                {
+                    message: error.message,
+                }
+            )
+        }
+    }
+
+
 
 }

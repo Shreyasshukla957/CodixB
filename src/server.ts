@@ -9,17 +9,21 @@ import authRouter from "./routes/user.auth.js";
 import { connectRedis } from "./config/redis.js";
 import adminRouter from "./routes/admin.auth.js";
 import problemrouter from "./routes/problem.routes.js";
+import { submitrouter } from "./routes/submit.routes.js";
+import { runrouter } from "./routes/run.route.js";
 
 app.use(express.json());
 app.use(cookieParser());
-app.use("/user",authRouter);
-app.use("/admin",adminRouter);
-app.use("/problem",problemrouter);
+app.use("/user", authRouter);
+app.use("/admin", adminRouter);
+app.use("/problem", problemrouter);
+app.use("/submit", submitrouter);
+app.use("/run",runrouter);
 
 async function start(): Promise<void> {
 
     try {
-        await Promise.all([main(),connectRedis()]);
+        await Promise.all([main(), connectRedis()]);
         console.log("Connection established with DB");
         app.listen(process.env.PORT || 4000, () => {
             console.log("listening at port no " + process.env.PORT);

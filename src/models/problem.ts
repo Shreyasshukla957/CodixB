@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 type ProblemTag = "array" | "Linkedlist" | "graph" | "dp";
 
-interface IProblem {
+export interface IProblem {
     title: string;
     description: string;
     difficulty: "easy" | "medium" | "hard";
@@ -22,7 +22,7 @@ interface IProblem {
         java: string,
         cpp:string,
     };
-    createdby: mongoose.Schema.Types.ObjectId;
+    createdby: mongoose.Types.ObjectId;
     referencesolution: {
         javascript: string,
         python: string,

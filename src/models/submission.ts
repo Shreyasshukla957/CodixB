@@ -16,7 +16,7 @@ interface ISubmit {
     totaltestpassed: number,
     memory: number,
     status: string,
-    
+
 }
 
 
@@ -50,12 +50,11 @@ const SubmissionSchema = new Schema<ISubmit>({
     },
     runtime: {
         type: Number,
-        required: true,
         default: 0,
     },
     memory: {
         type: Number,
-        required: true,
+        default: 0,
     },
     totaltestcases: {
         type: Number,
@@ -64,7 +63,6 @@ const SubmissionSchema = new Schema<ISubmit>({
     },
     errormessage: {
         type: String,
-        required: true,
         default: "",
     },
     totaltestpassed: {
@@ -80,6 +78,12 @@ const SubmissionSchema = new Schema<ISubmit>({
 }, {
     timestamps: true,
 })
+
+
+// Compound index on userId + pid:
+// Speeds up queries like submission.find({ userId, pid })
+// Similar to how MongoDB auto-indexes _id for fast lookups
+SubmissionSchema.index({ userId: 1, problemId: 1 })
 
 
 export const submission = mongoose.model<ISubmit>("submission", SubmissionSchema);

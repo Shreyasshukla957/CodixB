@@ -40,5 +40,4 @@ export const SolvedProblem = async (req: Request, res: Response<ResponseBody>) =
 
 }
 
-
 // waise jo populate se kaam kiya yeh same kaam hum submission.findbyid(user.id) krke bhi kr skte the saare jo user ne submit kiya h woh saare solved porblem mil jaate humein bina populate k

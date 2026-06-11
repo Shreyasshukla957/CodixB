@@ -2,14 +2,13 @@ import type { Request, Response } from "express"
 import type { RequestBody } from "./problem.controller.js"
 import problem from "../models/problem.js"
 import { languageId, submitBatch, submitToken } from "../utils/judge0.js"
-import type { CustomRequest } from "../middlewares/admin.middleware.js"
 
 interface Responsebody {
     message: string;
 }
 
 
-export const UpdateProblem = async (req: CustomRequest, res: Response<Responsebody>) => {
+export const UpdateProblem = async (req: Request, res: Response<Responsebody>) => {
 
     const id = req.params.id;
 

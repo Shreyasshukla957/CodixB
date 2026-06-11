@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import problem from "../models/problem.js";
 import { languageId, submitBatch, submitToken } from "../utils/judge0.js";
-import type { CustomRequest } from "../middlewares/admin.middleware.js";
 
 
 type ProblemTag = "array" | "Linkedlist" | "graph" | "dp";
@@ -41,7 +40,7 @@ interface Responsebody {
 
 
 
-export const CreateProblem = async (req: CustomRequest, res: Response<Responsebody>): Promise<void> => {
+export const CreateProblem = async (req: Request, res: Response<Responsebody>): Promise<void> => {
 
     try {
 
@@ -91,11 +90,11 @@ export const CreateProblem = async (req: CustomRequest, res: Response<Responsebo
 
             // here we can create a object for status id and it's error , something like this .
             // {
-                // 1:"in  queue",
-                // 2:"processing",
-                // 3:"Accepted",
-                // 4:"wrong ans",
-                // 5,6,7,8,---14.
+            // 1:"in  queue",
+            // 2:"processing",
+            // 3:"Accepted",
+            // 4:"wrong ans",
+            // 5,6,7,8,---14.
             // }
 
             console.log(testResult);
@@ -113,13 +112,13 @@ export const CreateProblem = async (req: CustomRequest, res: Response<Responsebo
 
         // Let's store it in our DB once the ans in correct 
 
-      const userProblem = await problem.create({
-           ...req.body as RequestBody,
-           createdby: req.result!._id,
+        const userProblem = await problem.create({
+            ...req.body as RequestBody,
+            createdby: req.result!._id,
         })
 
         res.status(200).send({
-            message:"Problem Saved",
+            message: "Problem Saved",
         })
 
     }

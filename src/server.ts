@@ -11,6 +11,13 @@ import adminRouter from "./routes/admin.auth.js";
 import problemrouter from "./routes/problem.routes.js";
 import { submitrouter } from "./routes/submit.routes.js";
 import { runrouter } from "./routes/run.route.js";
+import cors from "cors"
+
+
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true
+}));
 
 app.use(express.json());
 app.use(cookieParser());
@@ -18,7 +25,9 @@ app.use("/user", authRouter);
 app.use("/admin", adminRouter);
 app.use("/problem", problemrouter);
 app.use("/submit", submitrouter);
-app.use("/run",runrouter);
+app.use("/run", runrouter);
+
+
 
 async function start(): Promise<void> {
 

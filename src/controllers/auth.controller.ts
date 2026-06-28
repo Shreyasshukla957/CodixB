@@ -17,6 +17,7 @@ interface Registerbody {
 
 interface Responsebody {
     message: string;
+    user?: object;
 }
 
 
@@ -41,12 +42,22 @@ export const Register = async (req: Request<{}, {}, Registerbody>, res: Response
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 60 * 60 * 1000,
+            sameSite: "none",
+            secure: true,
         })
 
+        const result = {
+            Id: user._id,
+            emailId: user.emailId,
+            firstName: user.firstName,
+            role: user.role,
+        };
 
-        res.status(201).send({
-            message: "Registered Successfully"
-        })
+        // sending user data to front-end for displaying it in UI
+        res.status(200).json({
+            user: result,
+            message: "Registered Successful",
+        });
 
     }
     catch (error) {
@@ -99,11 +110,22 @@ export const login = async (req: Request<{}, {}, LoginBody>, res: Response<Respo
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 60 * 60 * 1000,
+            sameSite: "none",
+            secure: true,
         })
 
+        const result = {
 
+            Id: user._id,
+            emailId: user.emailId,
+            firstName: user.firstName,
+            role: user.role,
 
-        res.status(200).send({
+        };
+
+        // sending user data to front-end for displaying it in UI
+        res.status(200).json({
+            user: result,
             message: "Login Successful",
         });
     }
@@ -137,7 +159,9 @@ export const logout = async (req: Request, res: Response<Responsebody>): Promise
         await redisclient.set(`token:${token}`, "blocked", { EX: expiresIn });
 
         res.clearCookie("token", {
-            httpOnly: true
+            httpOnly: true,
+            sameSite: "none",
+            secure: true, //for https request 
         });
 
         res.status(200).send({ message: "Logged out successfully" });
@@ -186,6 +210,8 @@ export const AdminRegister = async (req: Request<{}, {}, AdminRegisterbody>, res
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 60 * 60 * 1000,
+            sameSite: "none",
+            secure: true,
         })
 
         res.status(201).send({
@@ -229,6 +255,36 @@ export const deleteProfile = async (req: Request, res: Response) => {
         }
     }
 
+
+
+}
+
+
+export const start = async (req: Request, res: Response) => {
+
+
+    try {
+        const data = req.result;
+
+        const result = {
+            Id: data._id,
+            Emailid: data.emailId,
+            firstName: data.firstName,
+            role: data.role,
+        }
+
+        res.status(200).json({
+            user: result,
+            message: "Request accepted",
+        })
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(500).send({
+                mesaage: error.message,
+            })
+        }
+    }
 
 
 }

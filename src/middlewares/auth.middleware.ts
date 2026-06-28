@@ -48,7 +48,7 @@ export const authMiddleware = async (req: Request, res: Response<AuthResponse>, 
 
         // jwt.verify ka return type broad hota hai: string ya object dono ho sakta hai.
         // Token banate time humne payload me { userid: ... } dala tha.
-        // Isliye decoded ko AuthTokenPayload type dete hain taaki decoded.userId safely use kar sakein.
+        // Isliye decoded ko jwtPayload type dete hain taaki decoded.userId safely use kar sakein.
         const decoded = jwt.verify(token, process.env.JWT_SKEY as string) as jwtPayload
 
         if (!decoded) {

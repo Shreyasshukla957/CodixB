@@ -12,7 +12,7 @@ export const FetchProblem = async (req: Request, res: Response) => {
         // .select(-code -updatedAt -__v) would not send fields mentioned in it to the foundproblem document. 
         // .select(title) would send fields mentioned in it to the foundproblem document.                           
 
-        const foundproblem = await problem.findById(id).select(" _id difficulty tags title ");
+        const foundproblem = await problem.findById(id).select(" _id difficulty tags title description referencesolution StartCode VisibleTestCases");
         if (!foundproblem) {
             throw new Error("Problem Doesn't Exist")
         }

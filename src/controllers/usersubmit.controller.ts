@@ -132,8 +132,13 @@ export const usersubmission = async (req: Request, res: Response) => {
         }
 
 
-        res.status(200).send({
-            message: "Data Stored",
+        res.status(200).json({
+           totaltestpassed:str_problem.totaltestpassed,
+           totaltestcases:getproblem.HiddenTestCases.length,
+           runtime,
+           memory,
+           isstatus,
+
         });
 
 
@@ -204,7 +209,7 @@ export const Runcode = async (req: Request, res: Response) => {
         const testResult = await submitToken(resulttoken);
 
         res.status(200).send({
-            message: testResult,
+            testResult,
         });
 
     }
